@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# database files (user data lives outside source code)
+/data
+planner.db
+*.db-shm
+*.db-wal
