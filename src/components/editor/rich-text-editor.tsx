@@ -30,7 +30,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          'prose prose-sm max-w-none focus:outline-none min-h-[300px] px-1',
+          'prose prose-sm max-w-none focus:outline-none min-h-[300px] px-1 text-gray-200',
       },
     },
     onUpdate: ({ editor: ed }) => {
@@ -76,10 +76,10 @@ export function RichTextEditor({
 
   return (
     <div className="flex flex-col h-full">
-      <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
+      <div className="flex items-center justify-between border-b border-gray-700 px-6 py-4">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-3">
-            <h1 className="text-lg font-semibold text-gray-900">{blockTitle}</h1>
+            <h1 className="text-lg font-semibold text-gray-100">{blockTitle}</h1>
             {saveState === 'saved' && (
               <span className="text-xs text-green-600 font-medium">Saved</span>
             )}
@@ -89,7 +89,7 @@ export function RichTextEditor({
               </span>
             )}
           </div>
-          <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">{hint}</p>
+          <p className="text-sm text-gray-400 mt-0.5 line-clamp-2">{hint}</p>
         </div>
         <div className="flex items-center gap-3 ml-4">
           <Button
@@ -109,7 +109,7 @@ export function RichTextEditor({
         </div>
       </div>
 
-      <div className="flex items-center gap-1 border-b border-gray-100 px-6 py-2">
+      <div className="flex items-center gap-1 border-b border-gray-700 px-6 py-2">
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBold().run()}
           active={editor.isActive('bold')}
@@ -128,7 +128,7 @@ export function RichTextEditor({
           label="S"
           className="line-through"
         />
-        <span className="w-px h-4 bg-gray-200 mx-1" />
+        <span className="w-px h-4 bg-gray-700 mx-1" />
         <ToolbarButton
           onClick={() =>
             editor.chain().focus().toggleHeading({ level: 2 }).run()
@@ -143,7 +143,7 @@ export function RichTextEditor({
           active={editor.isActive('heading', { level: 3 })}
           label="H3"
         />
-        <span className="w-px h-4 bg-gray-200 mx-1" />
+        <span className="w-px h-4 bg-gray-700 mx-1" />
         <ToolbarButton
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           active={editor.isActive('bulletList')}
@@ -182,8 +182,8 @@ function ToolbarButton({
         px-2 py-1 text-xs rounded transition-colors
         ${
           active
-            ? 'bg-gray-900 text-white'
-            : 'bg-transparent text-gray-600 hover:bg-gray-100'
+            ? 'bg-gray-100 text-gray-900'
+            : 'bg-transparent text-gray-300 hover:bg-gray-700'
         }
         ${className}
       `}

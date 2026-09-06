@@ -11,6 +11,7 @@ import {
 } from '@/lib/db';
 import { canvases, canvasBlocks } from '@/lib/db/schema';
 import { getFrameworkTemplate } from '@/lib/frameworks/lean-canvas';
+import { exportCanvasToMarkdown, exportCanvasToPdf } from '@/lib/export';
 import { eq, desc, and } from 'drizzle-orm';
 import { v4 as uuidv4 } from 'uuid';
 import { revalidatePath } from 'next/cache';
@@ -323,4 +324,67 @@ export async function saveBlock(formData: {
 
   revalidatePath(`/canvas/${parsed.data.canvasId}`);
   return { success: true };
+}
+
+const exportCanvasSchema = z.object({
+  canvasId: z.string().uuid(),
+  format: z.enum(['pdf', 'markdown']),
+});
+
+export type ExportActionResult =
+  | {
+      ok: true;
+      data: string;
+      encoding: 'base64' | 'utf8';
+      mimeType: string;
+      filename: string;
+    }
+  | { ok: false; error: string };
+
+export async function exportCanvas(formData: {
+  canvasId: string;
+  format: 'pdf' | 'markdown';
+}): Promise<ExportActionResult> {
+  const parsed = exportCanvasSchema.safeParse(formData);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0].message };
+  }
+
+  const canvas = await getCanvas(parsed.data.canvasId);
+  if (!canvas) {
+    return { ok: false, error: 'Canvas not found' };
+  }
+
+  try {
+    const result =
+      parsed.data.format === 'pdf'
+        ? await exportCanvasToPdf(parsed.data.canvasId)
+        : await exportCanvasToMarkdown(parsed.data.canvasId);
+
+    if (!result.success || !result.data) {
+      return { ok: false, error: result.message };
+    }
+
+    const isPdf = parsed.data.format === 'pdf';
+    const filename = `${sanitizeFilename(canvas.name)}${isPdf ? '.pdf' : '.md'}`;
+
+    return {
+      ok: true,
+      data: isPdf ? result.data.toString('base64') : result.data.toString('utf8'),
+      encoding: isPdf ? 'base64' : 'utf8',
+      mimeType: isPdf ? 'application/pdf' : 'text/markdown; charset=utf-8',
+      filename,
+    };
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Export failed' };
+  }
+}
+
+function sanitizeFilename(name: string): string {
+  const cleaned = name
+    .trim()
+    .replace(/[^a-zA-Z0-9-_ ]+/g, '')
+    .replace(/\s+/g, '-')
+    .toLowerCase();
+  return cleaned || 'canvas';
 }
