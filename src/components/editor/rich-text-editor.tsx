@@ -30,7 +30,7 @@ export function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          'prose prose-sm max-w-none focus:outline-none min-h-[300px] px-1 text-gray-200',
+          'prose prose-sm max-w-none focus:outline-none min-h-[300px] px-1 text-black-200',
       },
     },
     onUpdate: ({ editor: ed }) => {
